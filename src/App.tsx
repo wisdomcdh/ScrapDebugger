@@ -63,12 +63,20 @@ const EmptyImage = () => {
 
 const ScrapAction = (prop: ScrapActionProp) => {
   const [hint, setHint] = useState<String>("");
+  const [nRedirect, setNRedirect] = useState<boolean>(false);
+  const [nError, setNError] = useState<boolean>(false);
 
   useEffect(() => {
     const hasRedirect =
       prop.v.response_status >= 300 && prop.v.response_status < 400;
-    const hasMissMatch = prop.v.og_info && prop.v.og_info.url_match === false;
+    const hasError =
+      prop.v.response_status < 200 || prop.v.response_status >= 400;
+    const hasMissMatch = (prop.v.og_info?.url_match ?? true) === false;
     const needRedirect = hasRedirect || hasMissMatch;
+
+    setNRedirect(needRedirect);
+    setNError(hasError);
+
     let text = "완료";
     if (prop.i === 3 && needRedirect) {
       text = "최대 수집 시도 횟수 도닱";
@@ -85,6 +93,9 @@ const ScrapAction = (prop: ScrapActionProp) => {
             "og:url 에서 다시 수집 [사유 :og:image와 og:url의 도메인이 같지 않음]";
         }
       }
+    }
+    if (hasError) {
+      text = "오류";
     }
     setHint(text);
   }, [prop]);
@@ -108,7 +119,7 @@ const ScrapAction = (prop: ScrapActionProp) => {
                 borderRadius: 0
               }}
               label={prop.v.response_status}
-              color={prop.v.response_status < 300 ? "success" : "warning"}
+              color={nError ? "error" : nRedirect ? "warning" : "success"}
             />
           </div>
         }
@@ -158,7 +169,6 @@ export default function App() {
         setOnFetch(false);
       });
   };
-  const modalView = (v: ScrapResult) => {};
   return (
     <>
       <CssBaseline />
