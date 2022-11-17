@@ -71,10 +71,12 @@ const ScrapAction = (prop: ScrapActionProp) => {
       prop.v.response_status >= 300 && prop.v.response_status < 400;
     const hasError =
       prop.v.response_status < 200 || prop.v.response_status >= 400;
-    const hasMissMatch = (prop.v.og_info?.url_match ?? true) === false;
-    const needRedirect = hasRedirect || hasMissMatch;
+    const hasMissMatch = prop.v.og_info
+      ? prop.v.og_info.url_match === false
+      : false;
+    const needRedirect = (hasRedirect || hasMissMatch) && !prop.isLast;
 
-    setNRedirect(needRedirect);
+    setNRedirect(!!needRedirect);
     setNError(hasError);
 
     let text = "완료";
