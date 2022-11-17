@@ -15,7 +15,8 @@ import {
   Paper,
   Stack,
   TextField,
-  Typography
+  Typography,
+  LinearProgress
 } from "@mui/material";
 import isURL from "validator/lib/isURL";
 import React, { ChangeEvent, useEffect, useState } from "react";
@@ -140,16 +141,21 @@ export default function App() {
   const [lastScrap, setLastScrap] = useState<ScrapResult>();
   const [html, setHtml] = useState<string>();
   const [modal, setModal] = useState<boolean>(false);
+  const [onFetch, setOnFetch] = useState<boolean>(false);
   const urlChange = (e: ChangeEvent<HTMLInputElement>) => {
     setUrl(e.target.value);
     setUrlValid(isURL(e.target.value));
   };
   const scrap = () => {
+    setOnFetch(true);
     fetch("https://sample.chalcak.kr/scrap/go?url=" + encodeURIComponent(url))
       .then((res) => res.json())
       .then((data) => {
         setScraps(data);
         setLastScrap(data[data.length - 1]);
+      })
+      .finally(() => {
+        setOnFetch(false);
       });
   };
   const modalView = (v: ScrapResult) => {};
@@ -179,6 +185,7 @@ export default function App() {
                 스크랩 경로 디버깅
               </Button>
             </Paper>
+            {onFetch ? <LinearProgress /> : null}
             <Paper elevation={2}>
               <List dense={true}>
                 {scraps.map((v, i) => {
@@ -245,13 +252,6 @@ export default function App() {
           }}
         >
           {html}
-          {/* <AceEditor
-            mode="html"
-            value={html}
-            theme="github"
-            readOnly={true}
-            editorProps={{ $blockScrolling: true }}
-          /> */}
         </Box>
       </Modal>
     </>
