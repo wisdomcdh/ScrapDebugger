@@ -1,6 +1,8 @@
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import {
   Button,
   Card,
@@ -20,6 +22,7 @@ import {
 } from "@mui/material";
 import isURL from "validator/lib/isURL";
 import React, { ChangeEvent, useEffect, useState } from "react";
+import pretty from "pretty";
 
 interface OgInfo {
   og_image: string;
@@ -263,7 +266,12 @@ export default function App() {
             p: 2
           }}
         >
-          {html}
+          <SyntaxHighlighter
+            language="html"
+            style={{ ...docco, ...{ hljs: { padding: "0px" } } }}
+          >
+            {pretty(html)}
+          </SyntaxHighlighter>
         </Box>
       </Modal>
     </>
